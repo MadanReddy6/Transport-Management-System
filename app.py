@@ -215,21 +215,26 @@ def add_transportation():
         return jsonify({'msg': 'Failed to add transportation', 'error': str(err)}), 500
     return
 
+from flask import session
 
 @app.route('/archive_page')
 def archive_page():
     try:
+        user_id = session.get('user_id')
+        if not user_id:
+            return jsonify({'msg': 'User not logged in'}), 401
+
         page = request.args.get('page', 1, type=int)
         per_page = 3
         search = request.args.get('search', '', type=str)
 
         query = '''
-            SELECT t.transport_id, t.title,u.full_name,u.mobile_number,u.email, t.publishing_date, t.from_city, t.to_city, t.quantity, t.pickup_date, t.delivery_date, t.publishing_date, t.pickup_country, t.delivery_country, t.length_cm, t.width_cm, t.height_cm, t.price, t.weight_kg, t.image, t.pickup_address, t.drop_address, t.description
+            SELECT t.transport_id, t.title, u.full_name, u.mobile_number, u.email, t.publishing_date, t.from_city, t.to_city, t.quantity, t.pickup_date, t.delivery_date, t.publishing_date, t.pickup_country, t.delivery_country, t.length_cm, t.width_cm, t.height_cm, t.price, t.weight_kg, t.image, t.pickup_address, t.drop_address, t.description
             FROM Transport t
             JOIN User_Details u ON t.user_id = u.user_id
-            WHERE t.archive = 1
+            WHERE t.archive = 1 AND t.user_id = %s
         '''
-        params = []
+        params = [user_id]
         if search:
             wildcard_search = f'%{search}%'
             query += ' AND t.title LIKE %s'
@@ -244,7 +249,6 @@ def archive_page():
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({'msg': 'Failed to load archived transports', 'error': str(e)}), 500
-
 
 @app.route('/PlaceOrder_page/<int:transport_id>')
 def PlaceOrder_page(transport_id):
@@ -666,7 +670,7 @@ def unarchive_transport():
     if 'loggedin' not in session:
         flash('User not logged in', 'danger')
         return jsonify({'msg': 'User not logged in'}), 401
-
+    user_id = session['user_id']
     transport_id = request.form.get('transport_id')
     try:
         cursor.execute('UPDATE Transport SET archive = 0 WHERE transport_id = %s', (transport_id,))
