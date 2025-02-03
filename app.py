@@ -6,6 +6,7 @@ from werkzeug.utils import secure_filename
 import random
 import smtplib
 from flask_mail import Mail, Message
+import stripe
 # from email.mime.multipart import MIMEMultipart
 # from email.mime.text import MIMEText
 
@@ -46,6 +47,56 @@ app.config['MAIL_USERNAME'] = '19512varsha@gmail.com'  # Replace with your email
 app.config['MAIL_PASSWORD'] = 'nultjpikbivsgljc'  # Use environment variable for the password
 
 mail = Mail(app)
+
+# OTP configuration
+OTP_LENGTH = 6
+OTP_EXPIRY = 300  # 5 minutes
+
+@app.route('/otp_login_page')
+def otp_login_page():
+    return render_template('otp_login.html')
+
+@app.route('/send_otp', methods=['POST'])
+def send_otp():
+    email = request.form.get('email')
+    cursor.execute('SELECT * FROM Users WHERE email = %s', (email,))
+    user = cursor.fetchone()
+    if not user:
+        return jsonify({'msg': 'Email not registered'}), 404
+
+    otp = ''.join([str(random.randint(0, 9)) for _ in range(OTP_LENGTH)])
+    session['otp'] = otp
+    session['otp_email'] = email
+
+    msg = Message('Your OTP Code', sender=app.config['MAIL_USERNAME'], recipients=[email])
+    msg.body = f'Your OTP code is {otp}. It is valid for {OTP_EXPIRY // 60} minutes.'
+    try:
+        mail.send(msg)
+        return jsonify({'msg': 'OTP sent successfully'}), 200
+    except Exception as e:
+        print(f"Error sending OTP: {e}")
+        return jsonify({'msg': 'Failed to send OTP', 'error': str(e)}), 500
+
+@app.route('/verify_otp', methods=['POST'])
+def verify_otp():
+    otp = request.form.get('otp')
+    email = session.get('otp_email')
+    if not email or otp != session.get('otp'):
+        return jsonify({'msg': 'Invalid OTP'}), 400
+
+    cursor.execute('SELECT * FROM Users WHERE email = %s', (email,))
+    user = cursor.fetchone()
+    if not user:
+        return jsonify({'msg': 'User not found'}), 404
+
+    session['loggedin'] = True
+    session['login_id'] = user['login_id']
+    session['user_id'] = user['user_id']
+    session['Registered_as'] = user['register_as']
+    session.pop('otp', None)
+    session.pop('otp_email', None)
+
+    return jsonify({'msg': 'OTP verified successfully', 'redirect_url': url_for('index')}), 200
 
 @app.route('/')
 @app.route('/index')
@@ -299,11 +350,12 @@ def AllOffers_page():
         return jsonify({'msg': 'Failed to load offers', 'error': str(e)}), 500
 
 
+
 @app.route('/TransportDetails/<int:transport_id>')
 def TransportDetails(transport_id):
     try:
         cursor.execute('''
-            SELECT t.transport_id, t.title, t.publishing_date, t.from_city, t.to_city, t.quantity, t.pickup_date, t.delivery_date, t.pickup_address, t.drop_address, t.description, t.image, u.full_name as requistor_name, u.email, u.mobile_number as contact_number
+            SELECT t.transport_id, t.title, t.publishing_date, t.from_city, t.to_city, t.quantity, t.pickup_date, t.delivery_date, t.pickup_address, t.drop_address, t.description, t.image, t.price, u.full_name as requistor_name, u.email, u.mobile_number as contact_number
             FROM Transport t
             JOIN User_Details u ON t.user_id = u.user_id
             WHERE t.transport_id = %s
@@ -311,10 +363,61 @@ def TransportDetails(transport_id):
         transport = cursor.fetchone()
         if not transport:
             return jsonify({'msg': 'Transport not found'}), 404
+
+        # Convert Decimal to string for JSON serialization
+        transport = dict(transport)
+        transport['price'] = str(transport['price'])
+
         return render_template('TransportDetails.html', transport=transport)
     except Exception as e:
         print(f"Error: {e}")
         return jsonify({'msg': 'Failed to load transport details', 'error': str(e)}), 500
+
+
+# payment
+
+stripe.api_key = 'sk_test_51QoTzxFNo0h4tR8GNUdXHLJIAkvJIqnUD8vmSlihHIkuY1HDjab2KPThgZbS4tYoDACA8twAl1U4y26M8t7i6Nnu00Gyk7GgXX'  # Replace with your actual secret key
+
+@app.route('/create-checkout-session', methods=['POST'])
+def create_checkout_session():
+    try:
+        data = request.get_json()
+        transport_id = data.get('transport_id')
+
+        # Fetch transport details from the database using transport_id
+        cursor.execute('''
+            SELECT price
+            FROM Transport
+            WHERE transport_id = %s
+        ''', (transport_id,))
+        transport = cursor.fetchone()
+        if not transport:
+            return jsonify({'msg': 'Transport not found'}), 404
+
+        # Convert Decimal to integer amount in cents
+        amount = int(transport['price'] * 100)
+
+        session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{
+                'price_data': {
+                    'currency': 'usd',
+                    'product_data': {
+                        'name': 'Transport Service',
+                    },
+                    'unit_amount': amount,
+                },
+                'quantity': 1,
+            }],
+            mode='payment',
+            success_url='https://your-domain.com/success',
+            cancel_url='https://your-domain.com/cancel',
+        )
+        return jsonify({'id': session.id})
+    except Exception as e:
+        print(f"Error: {e}")
+        return jsonify(error=str(e)), 403
+
 
 # all freight in carrier
 @app.route('/AllFreights')
