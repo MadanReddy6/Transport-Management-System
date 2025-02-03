@@ -1,0 +1,66 @@
+{% extends 'base.html' %}
+
+{% block title %}Transport Details{% endblock %}
+
+{% block content %}
+<h3 class="text-center p-3">Freight Details</h3>
+
+<div class="container details-container align-content-center justify-content-center">
+    <div class="row">
+        <div class="col-md-4 col-12 details-image">
+            <img src="{{ url_for('static', filename='uploads/' ~ transport.image) }}" alt="Transport Image" class="img-fluid">
+        </div>
+        <div class="col-md-8 col-12">
+            <table class="table table-bordered details-table">
+                <tbody>
+                    <tr>
+                        <th scope="row">Transport title</th>
+                        <td>{{ transport.title }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Publishing Date</th>
+                        <td>{{ transport.publishing_date }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Freight Owner</th>
+                        <td>{{ transport.requistor_name }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Email</th>
+                        <td>{{ transport.email }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Contact Number</th>
+                        <td>{{ transport.contact_number }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Quantity</th>
+                        <td>{{ transport.quantity }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Pickup Date</th>
+                        <td>{{ transport.pickup_date }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Delivery Date</th>
+                        <td>{{ transport.delivery_date }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Pickup Address</th>
+                        <td>{{ transport.pickup_address }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Drop Address</th>
+                        <td>{{ transport.drop_address }}</td>
+                    </tr>
+                    <tr>
+                        <th scope="row">Description</th>
+                        <td>{{ transport.description }}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <button class="btn btn-success text-center" onclick="location.href='{{ url_for('PlaceOrder_page', transport_id=transport.transport_id) }}'">Place Order</button>
+        </div>
+    </div>
+</div>
+{% endblock %}

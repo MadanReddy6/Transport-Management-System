@@ -1,0 +1,51 @@
+<!-- index page -->
+    {% extends 'base.html' %}
+
+    {% block title %}Index Page{% endblock %}
+
+    {% block content %}
+    <div id="bgimg">
+    </div>
+    <div>
+        <h2 class="text-center mt-4 ">Welcome to the Transportation System</h2>
+    </div>
+
+    <!-- image container -->
+    <div class="container mt-4" style="width:80%;  ">
+        <div class="row justify-content-around ">
+            <div class="col-12 col-md-4 Ttype  text-center">
+                <img src="../static/images/road-transportation.png" alt="Road Transportation" >
+                <p class="py-3">Road transportation involves the movement of goods and people using vehicles on roads,
+                    providing
+                    flexibility and accessibility.</p>
+            </div>
+            <div class="col-12 col-md-4 Ttype  text-center">
+                <img src="../static/images/water transportaion.webp" alt="Water Transportation" class="img-fluid">
+                <p class="py-3">Water transportation relies on ships and boats to move goods and passengers across
+                    bodies of water.
+                </p>
+            </div>
+            <div class="col-12 col-md-4 Ttype  text-center">
+                <img src="../static/images/air transportation.jpg" alt="Air Transportation" class="img-fluid">
+                <p class="py-3">Air transportation enables fast travel over long distances using aircraft.</p>
+            </div>
+        </div>
+    </div>
+    <div class="bg-light mt-4  ">
+        <div class="container">
+            <div class="row justify-content-center align-items-center">
+                <div class="col-12 col-md-6 text-center">
+                    <img src="../static/images/Home page images TMS.jpg" alt="" class="img-fluid" height="400px" width="400px">
+                </div>
+                <div class="col-12 col-md-6 text-center ">
+                    <p class="p-3">A Transportation Management System (TMS) is a software platform designed to plan,
+                        execute, and
+                        optimize the movement of goods and services. It helps businesses streamline their transportation
+                        operations by automating tasks such as route planning, carrier selection, load optimization, and
+                        real-time tracking. </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% endblock %}

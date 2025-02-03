@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+
+{% block title %}All Offers{% endblock %}
+
+{% block content %}
+<h3 class="text-center p-3">All Offers</h3>
+
+<div class="container mt-5">
+    <div class="d-flex justify-content-between mb-3">
+        <form class="d-flex" method="GET" action="{{ url_for('AllOffers_page') }}">
+            <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search" value="{{ search }}">
+            <button class="btn btn-outline-success" type="submit">Search</button>
+        </form>
+    </div>
+    <div class="table-responsive">
+        {% if offers %}
+        <table class="table table-bordered table-hover mx-auto">
+            <thead class="thead-dark" style="background-color: rgb(146, 77, 27) !important;">
+                <tr>
+                    <th scope="col">Offer ID</th>
+                    <th scope="col">Image</th>
+                    <th scope="col">Freight Title</th>
+                    <th scope="col">Publishing Date</th>
+                    <th scope="col">Requestor Name</th>
+                    <th scope="col">Email</th>
+                    <!-- <th scope="col">Contact Number</th>
+                    <th scope="col">Carrier Name</th>
+                    <th scope="col">Carrier Email</th> -->
+                    <th scope="col">Carrier Contact</th>
+                    <th scope="col">Message</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for offer in offers %}
+                <tr>
+                    <td>{{ offer.offer_id }}</td>
+                    <td><img src="{{ url_for('static', filename='uploads/' ~ offer.image) }}" alt="Offer Image" width="100"></td>
+                    <td>{{ offer.freight_title }}</td>
+                    <td>{{ offer.publishing_date }}</td>
+                    <td>{{ offer.requestor_name }}</td>
+                    <td>{{ offer.email }}</td>
+                <td>{{ offer.contact_number }}</td>
+                {#    <td>{{ offer.carrier_name }}</td>
+                    <td>{{ offer.carrier_email }}</td>
+                    <td>{{ offer.carrier_contact }}</td>#}
+                    <td>{{ offer.message }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="alert alert-danger text-center" role="alert">
+            No offers found.
+        </div>
+        {% endif %}
+    </div>
+    {% if offers %}
+    <div class="d-flex justify-content-between pt-2">
+        <div>
+            Showing {{ (page - 1) * per_page + 1 }} to {{ min(page * per_page, total) }} of {{ total }} entries
+        </div>
+        <nav>
+            <ul class="pagination">
+                {% if page > 1 %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('AllOffers_page', page=page-1, search=search) }}">Previous</a>
+                </li>
+                {% endif %}
+                {% for p in range(1, (total // per_page) + 2) %}
+                <li class="page-item {% if p == page %}active{% endif %}">
+                    <a class="page-link" href="{{ url_for('AllOffers_page', page=p, search=search) }}">{{ p }}</a>
+                </li>
+                {% endfor %}
+                {% if page * per_page < total %}
+                <li class="page-item">
+                    <a class="page-link" href="{{ url_for('AllOffers_page', page=page+1, search=search) }}">Next</a>
+                </li>
+                {% endif %}
+            </ul>
+        </nav>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

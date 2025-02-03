@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+
+{% block title %}Place Order{% endblock %}
+
+{% block content %}
+<h3 class="text-center p-3">Place an Order</h3>
+
+<div class="container d-flex justify-content-center align-items-center my-5">
+    <div class="col-12 col-md-6">
+        <form id="placeOrderForm" method="POST" action="{{ url_for('place_order') }}">
+            <input type="hidden" name="transport_id" value="{{ transport.transport_id }}">
+            <div class="mb-3">
+                <label for="orderDetails" class="form-label">Order Details</label>
+                <textarea class="form-control" id="orderDetails" name="orderDetails" rows="5" required></textarea>
+            </div>
+            <div class="mb-3">
+                <label for="message" class="form-label">Message</label>
+                <textarea class="form-control" id="message" name="message" rows="3"></textarea>
+            </div>
+            <div class="d-grid">
+                <button type="submit" class="btn btn-success text-center">Submit Order</button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

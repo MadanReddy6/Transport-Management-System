@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}Forwarders Freights{% endblock %}
+
+{% block content %}
+<h3 class="text-center p-3">Forwarders Freights</h3>
+
+<div class="container mt-5">
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover mx-auto">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Transport ID</th>
+                    <th scope="col">Image</th>
+                    <th scope="col">Title</th>
+                    <th scope="col">Publishing Date</th>
+                    <th scope="col">Requistor Name</th>
+                    <th scope="col">Email</th>
+                    <th scope="col">Contact Number</th>
+                    <th scope="col">From City</th>
+                    <th scope="col">To City</th>
+                    <th scope="col">Quantity</th>
+                    <th scope="col">Pickup Date</th>
+                    <th scope="col">Delivery Date</th>
+                    <th scope="col">Pickup Address</th>
+                    <th scope="col">Drop Address</th>
+                    <th scope="col">Description</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for freight in freights %}
+                <tr>
+                    <td>{{ freight.transport_id }}</td>
+                    <td><img src="{{ url_for('static', filename='uploads/' ~ freight.image) }}" alt="Transport Image" width="100"></td>
+                    <td>{{ freight.title }}</td>
+                    <td>{{ freight.publishing_date }}</td>
+                    <td>{{ freight.requistor_name }}</td>
+                    <td>{{ freight.email }}</td>
+                    <td>{{ freight.contact_number }}</td>
+                    <td>{{ freight.from_city }}</td>
+                    <td>{{ freight.to_city }}</td>
+                    <td>{{ freight.quantity }}</td>
+                    <td>{{ freight.pickup_date }}</td>
+                    <td>{{ freight.delivery_date }}</td>
+                    <td>{{ freight.pickup_address }}</td>
+                    <td>{{ freight.drop_address }}</td>
+                    <td>{{ freight.description }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

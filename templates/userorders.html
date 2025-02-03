@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+
+{% block title %}User Orders{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <h2 class="text-center">My Orders</h2>
+    {% if orders %}
+    <div class="row">
+        {% for order in orders %}
+        <div class="col-md-4 mb-3">
+            <div class="card">
+                <img src="{{ url_for('static', filename='uploads/' ~ order.image) }}" class="card-img-top img-fluid" alt="{{ order.freight_title }}">
+                <div class="card-body">
+                    <h5 class="card-title">{{ order.freight_title }}</h5>
+                    <p class="card-text">From: {{ order.from_city }}, {{ order.pickup_country }}</p>
+                    <p class="card-text">To: {{ order.to_city }}, {{ order.delivery_country }}</p>
+                    <p class="card-text">Quantity: {{ order.quantity }}</p>
+                    <p class="card-text">Price: {{ order.price }}</p>
+                    <p class="card-text">Pickup Date: {{ order.pickup_date }}</p>
+                    <p class="card-text">Delivery Date: {{ order.delivery_date }}</p>
+                    <p class="card-text">Description: {{ order.description }}</p>
+                    <a href="{{ url_for('edit_order', login_id=order.login_id) }}" class="btn btn-primary">Edit Order</a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="alert alert-info" role="alert">
+        No orders found.
+    </div>
+    {% endif %}
+</div>
+
+<style>
+    .card-img-top {
+        height: 200px;
+        width: 100%;
+        object-fit: cover;
+    }
+</style>
+{% endblock %}

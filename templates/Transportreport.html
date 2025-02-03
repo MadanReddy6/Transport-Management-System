@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Transport Report{% endblock %}
+
+{% block content %}
+<h3 class="text-center p-3">All available Freights</h3>
+
+<body>
+    <div class="container mt-5">
+        <div class="d-flex justify-content-between mb-3">
+            <form class="d-flex" method="GET" action="{{ url_for('transportreport_page') }}">
+                <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search" name="search"
+                    value="{{ search }}">
+                <button class="btn btn-outline-success" type="submit">Search</button>
+            </form>
+        </div>
+        <div class="table-responsive">
+            {% if transports %}
+            <table class="table transport_table table-bordered table-hover mx-auto">
+                <thead class="thead-dark" style="background-color: rgb(146, 77, 27) !important;">
+                    <tr>
+                        <th scope="col">Transport ID</th>
+                        <th scope="col">Image</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Publishing Date</th>
+                        <th scope="col">Freight Ownwer</th>
+                        <th scope="col">Email</th>
+                        <th scope="col">Contact Number</th>
+                        <th scope="col">Pickup Address</th>
+                        <th scope="col">Drop Address</th>
+                        <th scope="col">Description</th>
+                        <th scope="col">Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for transport in transports %}
+                    <tr>
+                        <td>{{ transport.transport_id }}</td>
+                        <td><img src="{{ url_for('static', filename='uploads/' ~ transport.image) }}" alt="Transport Image" width="100"></td>
+                        <td>{{ transport.title }}</td>
+                        <td>{{ transport.publishing_date }}</td>
+                        <td>{{ transport.requistor_name }}</td>
+                        <td>{{ transport.email }}</td>
+                        <td>{{ transport.contact_number }}</td>
+                        <td>{{ transport.pickup_address }}</td>
+                        <td>{{ transport.drop_address }}</td>
+                        <td>{{ transport.description }}</td>
+                        <td>
+                            <form method="POST" action="{{ url_for('archive_transport') }}">
+                                <input type="hidden" name="transport_id" value="{{ transport.transport_id }}">
+                                <button type="submit" class="btn btn-danger btn-sm">Archive</button>
+                            </form>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <div class="alert alert-danger text-center" role="alert">
+                No records found.
+            </div>
+            {% endif %}
+        </div>
+        {% if transports %}
+        <div class="d-flex justify-content-between pt-2">
+            <div>
+                Showing {{ (page - 1) * per_page + 1 }} to {{ min(page * per_page, total) }} of {{ total }} entries
+            </div>
+            <nav>
+                <ul class="pagination">
+                    {% if page > 1 %}
+                    <li class="page-item">
+                        <a class="page-link"
+                            href="{{ url_for('transportreport_page', page=page-1, search=search) }}">Previous</a>
+                    </li>
+                    {% endif %}
+                    {% for p in range(1, (total // per_page) + 2) %}
+                    <li class="page-item {% if p == page %}active{% endif %}">
+                        <a class="page-link" href="{{ url_for('transportreport_page', page=p, search=search) }}">{{ p }}</a>
+                    </li>
+                    {% endfor %}
+                    {% if page * per_page < total %}
+                    <li class="page-item">
+                        <a class="page-link"
+                            href="{{ url_for('transportreport_page', page=page+1, search=search) }}">Next</a>
+                    </li>
+                    {% endif %}
+                </ul>
+            </nav>
+        </div>
+        {% endif %}
+    </div>
+</body>
+{% endblock %}
