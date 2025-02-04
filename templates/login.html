@@ -3,75 +3,29 @@
 {% block title %}Login{% endblock %}
 
 {% block content %}
-<div class="container col-md-6 align-items-center " >
+<div class="container col-md-6 align-items-center">
     <h2 class="text-center mt-4">Login</h2>
-    <form id="loginForm"   class="shadow p-3" onsubmit="return submitLoginForm(event)">
+    <form id="loginForm" class="shadow p-3" method="POST" action="{{ url_for('login') }}">
         <div class="mb-3">
             <label for="Id" class="form-label">Login ID</label>
-            <input type="text" class="form-control" id="Id" name="Id">
+            <input type="text" class="form-control" id="Id" name="Id" required>
         </div>
         <div class="mb-3 position-relative">
             <label for="Password" class="form-label">Password</label>
             <div class="input-group">
-                <input type="password" class="form-control" id="Password" name="Password">
+                <input type="password" class="form-control" id="Password" name="Password" required>
                 <span class="input-group-text eye-icon" onclick="togglePasswordVisibility('Password')">&#128065;</span>
             </div>
         </div>
         <div class="d-grid">
             <p class=""><a href="{{ url_for('forgot_password_page') }}">Forgot Password</a></p>
-            <button type="submit" class="btn text-white" style="background-color: blueviolet;">Login</button>
+            <button type="submit" class="btn text-white" style="background-color: blueviolet;">Send OTP</button>
         </div>
         <p class="text-center pt-3">Don't have an account? <a href="{{url_for('registor_page')}}">Sign Up</a></p>
     </form>
 </div>
 
 <script>
-    function validateLoginForm() {
-        const id = document.getElementById('Id').value;
-        const password = document.getElementById('Password').value;
-
-        if (!id) {
-            alert('Please enter your Login ID.');
-            document.getElementById('Id').focus();
-            return false;
-        }
-
-        if (!password) {
-            alert('Please enter your Password.');
-            document.getElementById('Password').focus();
-            return false;
-        }
-
-        return true;
-    }
-
-    async function submitLoginForm(event) {
-        event.preventDefault();
-        if (!validateLoginForm()) {
-            return;
-        }
-
-        const form = event.target;
-        const formData = new FormData(form);
-
-        try {
-            const response = await fetch('/login', {
-                method: 'POST',
-                body: formData
-            });
-
-            const result = await response.json();
-            if (response.ok) {
-                window.location.href = result.redirect_url;
-            } else {
-                alert(result.msg);
-            }
-        } catch (error) {
-            console.error('Error:', error);
-            alert('An error occurred');
-        }
-    }
-
     function togglePasswordVisibility(fieldId) {
         const field = document.getElementById(fieldId);
         if (field.type === 'password') {
@@ -95,6 +49,5 @@
         cursor: pointer;
         z-index: 2;
     }
-    </style>
 </style>
 {% endblock %}

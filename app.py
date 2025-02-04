@@ -7,6 +7,7 @@ import random
 import smtplib
 from flask_mail import Mail, Message
 import stripe
+import pyotp
 # from email.mime.multipart import MIMEMultipart
 # from email.mime.text import MIMEText
 
@@ -48,6 +49,51 @@ app.config['MAIL_PASSWORD'] = 'nultjpikbivsgljc'  # Use environment variable for
 
 mail = Mail(app)
 
+
+# app.route('/send-otp', methods=['POST'])
+# def send_otp():
+#     data = request.get_json()
+#     login_id = data.get('id')
+#     if not login_id:
+#         return jsonify({'msg': 'Login ID is required'}), 400
+
+#     # Fetch user email from the database using login_id
+#     cursor.execute('SELECT email FROM Users WHERE login_id = %s', (login_id,))
+#     user = cursor.fetchone()
+#     if not user:
+#         return jsonify({'msg': 'User not found'}), 404
+
+#     email = user['email']
+
+#     # Generate OTP
+#     otp = pyotp.TOTP(pyotp.random_base32()).now()
+
+#     # Store OTP in session
+#     session['otp'] = otp
+#     session['email'] = email
+
+#     # Send OTP to email
+#     msg = Message('Your OTP Code', recipients=[email])
+#     msg.body = f'Your OTP code is {otp}'
+#     mail.send(msg)
+
+#     return jsonify({'msg': 'OTP sent to your email'}), 200
+
+# @app.route('/verify-otp', methods=['POST'])
+# def verify_otp():
+#     otp = request.form.get('otp')
+#     if not otp:
+#         return jsonify({'msg': 'OTP is required'}), 400
+
+#     # Check if OTP matches
+#     if otp == session.get('otp'):
+#         # OTP is correct, log the user in
+#         session.pop('otp', None)  # Remove OTP from session
+#         return jsonify({'msg': 'OTP verified successfully'}), 200
+#     else:
+#         return jsonify({'msg': 'Invalid OTP'}), 400
+
+
 # OTP configuration
 OTP_LENGTH = 6
 OTP_EXPIRY = 300  # 5 minutes
@@ -56,47 +102,52 @@ OTP_EXPIRY = 300  # 5 minutes
 def otp_login_page():
     return render_template('otp_login.html')
 
-@app.route('/send_otp', methods=['POST'])
-def send_otp():
-    email = request.form.get('email')
-    cursor.execute('SELECT * FROM Users WHERE email = %s', (email,))
-    user = cursor.fetchone()
-    if not user:
-        return jsonify({'msg': 'Email not registered'}), 404
 
-    otp = ''.join([str(random.randint(0, 9)) for _ in range(OTP_LENGTH)])
-    session['otp'] = otp
-    session['otp_email'] = email
 
-    msg = Message('Your OTP Code', sender=app.config['MAIL_USERNAME'], recipients=[email])
-    msg.body = f'Your OTP code is {otp}. It is valid for {OTP_EXPIRY // 60} minutes.'
-    try:
-        mail.send(msg)
-        return jsonify({'msg': 'OTP sent successfully'}), 200
-    except Exception as e:
-        print(f"Error sending OTP: {e}")
-        return jsonify({'msg': 'Failed to send OTP', 'error': str(e)}), 500
+# @app.route('/send-otp', methods=['POST'])
+# def send_otp():
+#     data = request.get_json()
+#     login_id = data.get('id')
+#     print(f"Login ID: {login_id}")
+#     if not login_id:
+#         return jsonify({'msg': 'Login ID is required'}), 400
 
-@app.route('/verify_otp', methods=['POST'])
-def verify_otp():
-    otp = request.form.get('otp')
-    email = session.get('otp_email')
-    if not email or otp != session.get('otp'):
-        return jsonify({'msg': 'Invalid OTP'}), 400
+#     # Fetch user email from the database using login_id
+#     cursor.execute('SELECT email FROM user_details WHERE login_id = %s', (login_id,))
+#     user = cursor.fetchone()
+#     if not user:
+#         return jsonify({'msg': 'User not found'}), 404
 
-    cursor.execute('SELECT * FROM Users WHERE email = %s', (email,))
-    user = cursor.fetchone()
-    if not user:
-        return jsonify({'msg': 'User not found'}), 404
+#     email = user['email']
 
-    session['loggedin'] = True
-    session['login_id'] = user['login_id']
-    session['user_id'] = user['user_id']
-    session['Registered_as'] = user['register_as']
-    session.pop('otp', None)
-    session.pop('otp_email', None)
+#     # Generate OTP
+#     otp = pyotp.TOTP(pyotp.random_base32()).now()
 
-    return jsonify({'msg': 'OTP verified successfully', 'redirect_url': url_for('index')}), 200
+#     # Store OTP and login_id in session
+#     session['otp'] = otp
+#     session['email'] = email
+#     session['login_id'] = login_id
+
+#     # Send OTP to email
+#     msg = Message('Your OTP Code', recipients=[email])
+#     msg.body = f'Your OTP code is {otp}'
+#     mail.send(msg)
+
+#     return jsonify({'msg': 'OTP sent to your email'}), 200
+
+# @app.route('/verify-otp', methods=['POST'])
+# def verify_otp():
+#     otp = request.form.get('otp')
+#     if not otp:
+#         return jsonify({'msg': 'OTP is required'}), 400
+
+#     # Check if OTP matches
+#     if otp == session.get('otp'):
+#         # OTP is correct, log the user in
+#         session.pop('otp', None)  # Remove OTP from session
+#         return jsonify({'msg': 'OTP verified successfully', 'login_id': session.get('login_id')}), 200
+#     else:
+#         return jsonify({'msg': 'Invalid OTP'}), 400
 
 @app.route('/')
 @app.route('/index')
@@ -432,7 +483,7 @@ def AllFreightInCarrier():
         search = request.args.get('search', '', type=str)
 
         query = '''
-            SELECT t.transport_id, t.title, t.publishing_date, t.from_city, t.to_city, t.quantity,t.price, t.pickup_date, t.delivery_date, t.pickup_address, t.drop_address, t.description, t.image, u.full_name as requistor_name, u.email, u.mobile_number as contact_number
+            SELECT t.transport_id, t.title, t.publishing_date, t.from_city, t.to_city, t.quantity,t.price, t.pickup_date, t.delivery_date, t.publishing_date, t.pickup_country, t.delivery_country, t.length_cm, t.width_cm, t.height_cm, t.price, t.weight_kg, t.image, t.pickup_address, t.drop_address, t.description
             FROM Transport t
             JOIN User_Details u ON t.user_id = u.user_id
         '''
@@ -508,33 +559,61 @@ def get_cities(country_code, state_code):
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    msg = ''
     if request.method == 'POST':
-        id = request.form['Id']
+        login_id = request.form['Id']
         password = request.form['Password']
-        print(f'--------------------{id} {password}')
-        cursor = conn.cursor(dictionary=True)
-        cursor.execute('SELECT * FROM users WHERE login_id = %s AND password = %s', (id, password,))
+        cursor.execute('''
+            SELECT u.*, ud.email 
+            FROM Users u
+            JOIN User_Details ud ON u.user_id = ud.user_id
+            WHERE u.login_id = %s AND u.password = %s
+        ''', (login_id, password))
         account = cursor.fetchone()
-        print(f'--------------------{account}')
+        print(f"Account: {account}")
         if account:
-            session['loggedin'] = True
-            session['login_id'] = account['login_id']
-            session['user_id'] = account['user_id']
-            session['Registered_as'] = account['register_as']
-            print(f"--------------------{session['login_id']}")
-            # session['full_name'] = account['full_name']
-            Registered_as = account['register_as']
-            print(f'*********************{Registered_as}')
-            if Registered_as == 'Carrier':
-                return jsonify({'redirect_url': url_for('CarrierDB')}), 200
-            elif Registered_as == 'Forwarder':
-                return jsonify({'redirect_url': url_for('ForwarderDB')}), 200
+            email = account['email']
+            otp = ''.join([str(random.randint(0, 9)) for _ in range(OTP_LENGTH)])
+            session['otp'] = otp
+            session['otp_email'] = email
+            session['login_id'] = login_id
+            session['user_role'] = account['register_as']
+
+            msg = Message('Your OTP Code', sender=app.config['MAIL_USERNAME'], recipients=[email])
+            msg.body = f'Your OTP code is {otp}. It is valid for {OTP_EXPIRY // 60} minutes.'
+            try:
+                mail.send(msg)
+                return redirect(url_for('verify_otp_page'))
+            except smtplib.SMTPException as e:
+                print(f"SMTP error occurred: {e}")
+                flash('Failed to send OTP. Please try again.', 'danger')
+                return redirect(url_for('login'))
         else:
             flash('Incorrect username / password!', 'danger')
-            return jsonify({'msg': 'Incorrect username / password!'}), 401
-        
-    return render_template('login.html', msg=msg), 200
+            return redirect(url_for('login'))
+    return render_template('login.html')
+
+@app.route('/verify_otp_page')
+def verify_otp_page():
+    return render_template('verify_otp.html')
+
+@app.route('/verify_otp', methods=['POST'])
+def verify_otp():
+    otp = request.form.get('otp')
+    if otp == session.get('otp'):
+        session.pop('otp', None)
+        session.pop('otp_email', None)
+        session['loggedin'] = True
+        login_id = session.get('login_id')
+        user_role = session.get('user_role')
+        if user_role == 'Carrier':
+            return redirect(url_for('CarrierDB'))
+        elif user_role == 'Forwarder':
+            return redirect(url_for('ForwarderDB'))
+        else:
+            return redirect(url_for('index'))
+    else:
+        flash('Invalid OTP!', 'danger')
+        return redirect(url_for('verify_otp_page'))
 
 #logout
 
@@ -581,7 +660,7 @@ def transportreport_page():
         user_id = session['user_id']
 
         query = '''
-            SELECT t.transport_id, t.title, t.publishing_date, t.from_city, t.to_city, t.quantity, t.pickup_date, t.delivery_date, t.pickup_address, t.drop_address, t.description, t.image, u.full_name as requistor_name, u.email, u.mobile_number as contact_number
+            SELECT t.transport_id, t.title, t.publishing_date, t.from_city, t.to_city, t.quantity, t.pickup_date, t.delivery_date, t.publishing_date, t.pickup_country, t.delivery_country, t.length_cm, t.width_cm, t.height_cm, t.price, t.weight_kg, t.image, t.pickup_address, t.drop_address, t.description
             FROM Transport t
             JOIN User_Details u ON t.user_id = u.user_id
             WHERE t.user_id = %s AND t.archive = 0
@@ -607,7 +686,7 @@ def transportreport_page():
 def all_freights():
     try:
         cursor.execute('''
-            SELECT t.transport_id, t.title, t.publishing_date, t.from_city, t.to_city, t.quantity, t.pickup_date, t.delivery_date, t.pickup_address, t.drop_address, t.description, t.image, u.full_name as requistor_name, u.email, u.mobile_number as contact_number
+            SELECT t.transport_id, t.title, t.publishing_date, t.from_city, t.to_city, t.quantity, t.pickup_date, t.delivery_date, t.publishing_date, t.pickup_country, t.delivery_country, t.length_cm, t.width_cm, t.height_cm, t.price, t.weight_kg, t.image, t.pickup_address, t.drop_address, t.description, u.full_name as requistor_name, u.email, u.mobile_number as contact_number
             FROM Transport t
             JOIN User_Details u ON t.user_id = u.user_id
         ''')
@@ -622,7 +701,7 @@ def all_freights():
 def forwarders_freights():
     try:
         cursor.execute('''
-            SELECT t.transport_id, t.title, t.publishing_date, t.from_city, t.to_city, t.quantity, t.pickup_date, t.delivery_date, t.pickup_address, t.drop_address, t.description, t.image, u.full_name as requistor_name, u.email, u.mobile_number as contact_number
+            SELECT t.transport_id, t.title, t.publishing_date, t.from_city, t.to_city, t.quantity, t.pickup_date, t.delivery_date, t.publishing_date, t.pickup_country, t.delivery_country, t.length_cm, t.width_cm, t.height_cm, t.price, t.weight_kg, t.image, t.pickup_address, t.drop_address, t.description, u.full_name as requistor_name, u.email, u.mobile_number as contact_number
             FROM Transport t
             JOIN User_Details u ON t.user_id = u.user_id
             WHERE u.register_as = 'Forwarder'
