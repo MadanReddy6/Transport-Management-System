@@ -20,8 +20,8 @@
                 <img src="{{ url_for('static', filename='uploads/' ~ freight.image) }}" class="card-img-top img-fluid" alt="{{ freight.title }}">
                 <div class="card-body">
                     <h5 class="card-title">{{ freight.title }}</h5>
-                    <p class="card-text">From: {{ freight.from_city }}, {{ freight.pickup_country }}</p>
-                    <p class="card-text">To: {{ freight.to_city }}, {{ freight.delivery_country }}</p>
+                    <p class="card-text">From: {{ freight.pickup_address }}</p>
+                    <p class="card-text">To: {{ freight.drop_address }}</p>
                     <p class="card-text">Quantity: {{ freight.quantity }}</p>
                     <p class="card-text">Price: {{ freight.price }}</p>
                     <a href="{{ url_for('TransportDetails', transport_id=freight.transport_id) }}" class="btn btn-primary">View Details</a>

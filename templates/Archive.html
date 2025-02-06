@@ -4,7 +4,15 @@
 
 {% block content %}
 <h3 class="text-center p-3">Archived Freight Details</h3>
-
+{% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alert-container col-6 container">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
 <div class="container mt-5">
     <div class="d-flex justify-content-between mb-3">
         <form class="d-flex" method="GET" action="{{ url_for('archive_page') }}">

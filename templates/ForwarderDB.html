@@ -5,8 +5,16 @@
 {% block content %}
 <div class="container">
     <h2 class="text-center my-4">Forwarder Dashboard</h2>
-    <!-- <h3 class="text-center p-3">Dashboard</h3> -->
-    
+   {# <!-- <h3 class="text-center p-3">Dashboard</h3> -->
+    <!-- {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alert-container col-6 container">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %} -->#}
     <div class="d-flex flex-wrap justify-content-center gap-lg-5 gap-5 align-items-center justify-content-center px-2">
         <div class="dashboard "><a href="{{url_for('freight')}}"><img src="../static/images/DB pic one logo.png" alt=""></a></div>
         <div class="dashboard "><a href="{{url_for('transportreport_page')}}"><img src="../static/images/Report pic.png" alt=""></a></div>

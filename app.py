@@ -8,9 +8,9 @@ import smtplib
 from flask_mail import Mail, Message
 import stripe
 import pyotp
-# from email.mime.multipart import MIMEMultipart
-# from email.mime.text import MIMEText
-
+import string
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
 
 app = Flask(__name__)
 
@@ -50,49 +50,6 @@ app.config['MAIL_PASSWORD'] = 'nultjpikbivsgljc'  # Use environment variable for
 mail = Mail(app)
 
 
-# app.route('/send-otp', methods=['POST'])
-# def send_otp():
-#     data = request.get_json()
-#     login_id = data.get('id')
-#     if not login_id:
-#         return jsonify({'msg': 'Login ID is required'}), 400
-
-#     # Fetch user email from the database using login_id
-#     cursor.execute('SELECT email FROM Users WHERE login_id = %s', (login_id,))
-#     user = cursor.fetchone()
-#     if not user:
-#         return jsonify({'msg': 'User not found'}), 404
-
-#     email = user['email']
-
-#     # Generate OTP
-#     otp = pyotp.TOTP(pyotp.random_base32()).now()
-
-#     # Store OTP in session
-#     session['otp'] = otp
-#     session['email'] = email
-
-#     # Send OTP to email
-#     msg = Message('Your OTP Code', recipients=[email])
-#     msg.body = f'Your OTP code is {otp}'
-#     mail.send(msg)
-
-#     return jsonify({'msg': 'OTP sent to your email'}), 200
-
-# @app.route('/verify-otp', methods=['POST'])
-# def verify_otp():
-#     otp = request.form.get('otp')
-#     if not otp:
-#         return jsonify({'msg': 'OTP is required'}), 400
-
-#     # Check if OTP matches
-#     if otp == session.get('otp'):
-#         # OTP is correct, log the user in
-#         session.pop('otp', None)  # Remove OTP from session
-#         return jsonify({'msg': 'OTP verified successfully'}), 200
-#     else:
-#         return jsonify({'msg': 'Invalid OTP'}), 400
-
 
 # OTP configuration
 OTP_LENGTH = 6
@@ -104,50 +61,6 @@ def otp_login_page():
 
 
 
-# @app.route('/send-otp', methods=['POST'])
-# def send_otp():
-#     data = request.get_json()
-#     login_id = data.get('id')
-#     print(f"Login ID: {login_id}")
-#     if not login_id:
-#         return jsonify({'msg': 'Login ID is required'}), 400
-
-#     # Fetch user email from the database using login_id
-#     cursor.execute('SELECT email FROM user_details WHERE login_id = %s', (login_id,))
-#     user = cursor.fetchone()
-#     if not user:
-#         return jsonify({'msg': 'User not found'}), 404
-
-#     email = user['email']
-
-#     # Generate OTP
-#     otp = pyotp.TOTP(pyotp.random_base32()).now()
-
-#     # Store OTP and login_id in session
-#     session['otp'] = otp
-#     session['email'] = email
-#     session['login_id'] = login_id
-
-#     # Send OTP to email
-#     msg = Message('Your OTP Code', recipients=[email])
-#     msg.body = f'Your OTP code is {otp}'
-#     mail.send(msg)
-
-#     return jsonify({'msg': 'OTP sent to your email'}), 200
-
-# @app.route('/verify-otp', methods=['POST'])
-# def verify_otp():
-#     otp = request.form.get('otp')
-#     if not otp:
-#         return jsonify({'msg': 'OTP is required'}), 400
-
-#     # Check if OTP matches
-#     if otp == session.get('otp'):
-#         # OTP is correct, log the user in
-#         session.pop('otp', None)  # Remove OTP from session
-#         return jsonify({'msg': 'OTP verified successfully', 'login_id': session.get('login_id')}), 200
-#     else:
-#         return jsonify({'msg': 'Invalid OTP'}), 400
 
 @app.route('/')
 @app.route('/index')
@@ -562,6 +475,16 @@ def login():
     if request.method == 'POST':
         login_id = request.form['Id']
         password = request.form['Password']
+        print(login_id,password)
+
+        # Check if user ID exists in the database
+        cursor.execute('SELECT * FROM Users WHERE login_id = %s', (login_id,))
+        user = cursor.fetchone()
+        print('user======',user)
+        if not user:
+            flash('User ID does not exist!', 'danger')
+            return redirect(url_for('login'))
+
         cursor.execute('''
             SELECT u.*, ud.email 
             FROM Users u
@@ -576,7 +499,8 @@ def login():
             session['otp'] = otp
             session['otp_email'] = email
             session['login_id'] = login_id
-            session['user_role'] = account['register_as']
+            session['register_as'] = account['register_as']
+            session['user_id'] = account['user_id']
 
             msg = Message('Your OTP Code', sender=app.config['MAIL_USERNAME'], recipients=[email])
             msg.body = f'Your OTP code is {otp}. It is valid for {OTP_EXPIRY // 60} minutes.'
@@ -604,10 +528,11 @@ def verify_otp():
         session.pop('otp_email', None)
         session['loggedin'] = True
         login_id = session.get('login_id')
-        user_role = session.get('user_role')
-        if user_role == 'Carrier':
+        register_as = session.get('register_as')
+        # flash('Loged in successfully!', 'success')
+        if register_as == 'Carrier':
             return redirect(url_for('CarrierDB'))
-        elif user_role == 'Forwarder':
+        elif register_as == 'Forwarder':
             return redirect(url_for('ForwarderDB'))
         else:
             return redirect(url_for('index'))
@@ -634,6 +559,11 @@ def change_password():
     user_id = session['user_id']
     current_password = request.form.get('currentPassword', '')
     new_password = request.form.get('newPassword', '')
+    confirm_password = request.form.get('confirmPassword', '')
+
+    if new_password != confirm_password:
+        flash('New password and confirm password do not match', 'danger')
+        return jsonify({'msg': 'New password and confirm password do not match'}), 400
 
     cursor.execute('SELECT password FROM Users WHERE user_id = %s', (user_id,))
     user = cursor.fetchone()
@@ -649,7 +579,9 @@ def change_password():
     except mysql.connector.Error as err:
         flash('Failed to change password', 'danger')
         return jsonify({'msg': 'Failed to change password', 'error': str(err)}), 500
-
+@app.route('/change_password_page')
+def change_password_page():
+    return render_template('change_password.html')
 
 @app.route('/transportreport_page')
 def transportreport_page():
@@ -658,13 +590,15 @@ def transportreport_page():
         per_page = 3
         search = request.args.get('search', '', type=str)
         user_id = session['user_id']
+        print('---------------*****',user_id)
 
         query = '''
-            SELECT t.transport_id, t.title, t.publishing_date, t.from_city, t.to_city, t.quantity, t.pickup_date, t.delivery_date, t.publishing_date, t.pickup_country, t.delivery_country, t.length_cm, t.width_cm, t.height_cm, t.price, t.weight_kg, t.image, t.pickup_address, t.drop_address, t.description
+            SELECT t.transport_id, t.title, t.publishing_date, t.from_city, t.to_city, t.quantity, t.pickup_date, t.delivery_date, t.publishing_date, t.pickup_country, t.delivery_country, t.length_cm, t.width_cm, t.height_cm, t.price, t.weight_kg, t.image, t.pickup_address, t.drop_address, t.description, u.full_name, u.email, u.mobile_number
             FROM Transport t
             JOIN User_Details u ON t.user_id = u.user_id
             WHERE t.user_id = %s AND t.archive = 0
         '''
+        print('---------------',query)
         params = [user_id]
         if search:
             wildcard_search = f'%{search}%'
@@ -718,49 +652,45 @@ def place_order():
     if 'loggedin' not in session:
         return jsonify({'msg': 'User not logged in'}), 401
 
+    user_id = session['user_id']
     transport_id = request.form.get('transport_id')
-    order_details = request.form.get('orderDetails')
     message = request.form.get('message')
-    print(f'=================={transport_id} {order_details} {message}')
 
-    if not transport_id or not order_details:
-        return jsonify({'msg': 'Transport ID and Order Details are required'}), 400
+    if not transport_id:
+        return jsonify({'msg': 'Transport ID is required'}), 400
 
     try:
-        # Fetch transport details using a separate cursor
-        cursor1 = conn.cursor(dictionary=True)
-        cursor1.execute('''
+        # Fetch transport details
+        cursor.execute('''
             SELECT t.image, t.title AS freight_title, t.publishing_date, u.full_name AS requestor_name, u.email, u.mobile_number AS contact_number
             FROM Transport t
             JOIN User_Details u ON t.user_id = u.user_id
             WHERE t.transport_id = %s
         ''', (transport_id,))
-        transport = cursor1.fetchone()
-        cursor1.close()
-        print(f".....................{transport}")
+        transport = cursor.fetchone()
 
         if not transport:
             return jsonify({'msg': 'Transport not found'}), 404
 
-        # Fetch carrier details using the logged-in user's ID
+        # Fetch carrier details using a separate cursor
         cursor2 = conn.cursor(dictionary=True)
         cursor2.execute('''
             SELECT full_name, email, mobile_number
             FROM User_Details
             WHERE user_id = %s
-        ''', (session['user_id'],))
+        ''', (user_id,))
         carrier = cursor2.fetchone()
         cursor2.close()
-        print(f"Carrier details: {carrier}")
 
         if not carrier:
             return jsonify({'msg': 'Carrier not found'}), 404
 
-        # Insert into Offer table using the main cursor
+        # Insert into Offer table
         cursor.execute('''
             INSERT INTO Offer (transport_id, image, freight_title, publishing_date, requestor_name, email, contact_number, message)
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
         ''', (transport_id, transport['image'], transport['freight_title'], transport['publishing_date'], carrier['full_name'], carrier['email'], carrier['mobile_number'], message))
+
         conn.commit()
         flash('Order placed successfully!', 'success')
         return redirect(url_for('AllFreightInCarrier'))
@@ -942,7 +872,105 @@ def contact():
 
     return render_template('Contactus.html')
 
+def send_email(to_email, subject, body):
+    sender_email = "19512varsha@gmail.com"
+    sender_password = "nultjpikbivsgljc"
+    smtp_server = "smtp.gmail.com"
+    smtp_port = 587
+
+    try:
+        # Create the email message
+        msg = MIMEMultipart()
+        msg['From'] = sender_email
+        msg['To'] = to_email
+        msg['Subject'] = subject
+        msg.attach(MIMEText(body, 'plain'))
+
+        # Connect to the SMTP server
+        server = smtplib.SMTP(smtp_server, smtp_port)
+        server.starttls()  # Upgrade the connection to a secure encrypted SSL/TLS connection
+        server.login(sender_email, sender_password)
+        server.sendmail(sender_email, to_email, msg.as_string())
+        server.quit()
+        print("Email sent successfully")
+    except Exception as e:
+        print(f"Error sending email: {e}")
+
+def generate_otp():
+    return ''.join(random.choices(string.digits, k=6))
+
+@app.route('/forgot_password')
+def forgot_password():
+    return render_template('forgot_password.html')
+
+otp_storage = {}
+email_storage = {}
+
+
+@app.route('/send-password-reset-otp', methods=['POST'])
+def send_password_reset_otp():
+    data = request.get_json()
+    email = data.get('email')
+    cursor.execute('SELECT * FROM User_Details WHERE email = %s', (email,))
+    user = cursor.fetchone()
+    
+    if user:
+        otp = generate_otp()
+        otp_storage[email] = otp
+        email_storage[otp] = email
+        session['email']=email
+        print(f"Email=================: {session['email']}")
+        send_email(email, "Password Reset OTP", f"Your OTP is: {otp}")
+        print(f"OTP=================: {otp}")
+        return jsonify({"msg": "OTP sent to your email."}), 200
+    else:
+        return jsonify({"msg": "Email not found."}), 404
+
+@app.route('/verify-password-reset-otp')
+def verify_password_reset_otp():
+    return render_template('verify_password_reset_otp.html')
+
+@app.route('/verify-password-reset-otp', methods=['POST'])
+def verify_password_reset_otp_post():
+    data = request.get_json()
+    otp = data.get('otp')
+    email = session.get('email')
+    print('------------------', email, otp)
+    # email = email_storage.get(otp)
+    stored_otp = otp_storage.get(email)
+    print('------------------', email, otp)
+    
+    if stored_otp and stored_otp == otp:
+        return jsonify({"msg": "OTP verified.", "redirect_url": url_for('reset_password')}), 200
+    else:
+        return jsonify({"msg": "Invalid OTP."}), 400
+
+@app.route('/reset_password')
+def reset_password():
+    return render_template('reset_password.html')
+
+@app.route('/reset_password', methods=['POST'])
+def reset_password_post():
+    data = request.get_json()
+    otp = data.get('otp')
+    new_password = data.get('new_password')
+    email = session.get('email')
+    # email = email_storage.get(otp)  # Retrieve email using OTP
+    print('------------------', email, otp)
+    
+    if email:
+        cursor.execute('SELECT * FROM User_Details WHERE email = %s', (email,))
+        user = cursor.fetchone()
+        print(f'==========={user}')
+        
+        if user:
+            cursor.execute('UPDATE Users SET password = %s WHERE user_id = %s', (new_password, user['user_id']))
+            conn.commit()
+            return jsonify({"msg": "Password reset successful.", "redirect_url": url_for('login')}), 200
+        else:
+            return jsonify({"msg": "Email not found."}), 404
+    else:
+        return jsonify({"msg": "Invalid OTP."}), 400
+
 if __name__ == '__main__':
     app.run(debug=True)
-
-

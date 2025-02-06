@@ -5,9 +5,9 @@
 {% block content %}
 <h3 class="text-center p-3">Freight Details</h3>
 
-<div class="container details-container align-content-center justify-content-center">
+<div class="container details-container align-content-center justify-content-center shadow-lg rounded-2 py-5">
     <div class="row">
-        <div class="col-md-4 col-12 details-image">
+        <div class="col-md-4 col-12 details-image border border-danger d-flex justify-content-center align-items-center" style="height: 250px;">
             <img src="{{ url_for('static', filename='uploads/' ~ transport.image) }}" alt="Transport Image" class="img-fluid">
         </div>
         <div class="col-md-8 col-12">

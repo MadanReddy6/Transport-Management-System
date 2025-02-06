@@ -35,7 +35,7 @@
                     </li>
 
                     {% if session.get('loggedin') %}
-                    {% if session.get('Registered_as') == 'Forwarder' %}
+                    {% if session.get('register_as') == 'Forwarder' %}
                     <li class="nav-item">
                         <a class="nav-link" href="{{url_for('ForwarderDB')}}">Dashboard</a>
                     </li>
@@ -55,7 +55,7 @@
                     </li>
 
                     <!-- CARRIER DASH BOARD -->
-                    {% elif session.get('Registered_as') == 'Carrier' %}
+                    {% elif session.get('register_as') == 'Carrier' %}
 
         
                     <li class="nav-item">

@@ -4,18 +4,30 @@
 
 {% block content %}
 <div class="container col-md-6 align-items-center">
+
     <h2 class="text-center mt-4">Login</h2>
-    <form id="loginForm" class="shadow p-3" method="POST" action="{{ url_for('login') }}">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alert-container">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
+    <form id="loginForm" class="shadow p-3" method="POST" action="{{ url_for('login') }}" onsubmit="return validateLoginForm()">
         <div class="mb-3">
             <label for="Id" class="form-label">Login ID</label>
-            <input type="text" class="form-control" id="Id" name="Id" required>
+            <input type="text" class="form-control" id="Id" name="Id">
+            <p id="loginIdError" class="text-danger"></p>
         </div>
         <div class="mb-3 position-relative">
             <label for="Password" class="form-label">Password</label>
             <div class="input-group">
-                <input type="password" class="form-control" id="Password" name="Password" required>
+                <input type="password" class="form-control" id="Password" name="Password" pattern=".{8,}" title="Password must be at least 8 characters long">
                 <span class="input-group-text eye-icon" onclick="togglePasswordVisibility('Password')">&#128065;</span>
             </div>
+            <p id="passwordError" class="text-danger"></p>
         </div>
         <div class="d-grid">
             <p class=""><a href="{{ url_for('forgot_password_page') }}">Forgot Password</a></p>
@@ -33,6 +45,33 @@
         } else {
             field.type = 'password';
         }
+    }
+
+    function validateLoginForm() {
+        const loginIdInput = document.getElementById('Id');
+        const passwordInput = document.getElementById('Password');
+        // const loginIdPattern = /^[a-zA-Z0-9_]{5,20}$/;
+        const passwordPattern = /.{8,}/;
+        const loginIdError = document.getElementById('loginIdError');
+        const passwordError = document.getElementById('passwordError');
+
+        if (!loginIdInput.value) {
+            loginIdError.textContent = 'Please enter login id';
+            return false;
+        }
+        // if (!loginIdPattern.test(loginIdInput.value)) {
+        //     loginIdError.textContent = 'Please enter login id';
+        //     return false;
+        // }
+
+        if (!passwordPattern.test(passwordInput.value)) {
+            passwordError.textContent = 'Please enter password';
+            return false;
+        }
+
+        loginIdError.textContent = '';
+        passwordError.textContent = '';
+        return true;
     }
 </script>
 

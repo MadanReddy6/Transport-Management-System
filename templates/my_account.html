@@ -3,60 +3,83 @@
 {% block title %}My Account{% endblock %}
 
 {% block content %}
-<div class="container d-flex justify-content-center align-items-center my-5">
-    <div class="col-12 col-md-6">
+<div class="container d-flex justify-content-center align-items-center my-5 py-5 shadow col-8">
+    <div class="col-12">
         <h4 class="text-center">My Account</h4>
+        {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="alert-container col-6 container">
+            {% for category, message in messages %}
+            <div class="alert alert-{{ category }}">{{ message }}</div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endwith %}
         <form id="accountForm" method="POST" action="{{ url_for('update_account') }}" enctype="multipart/form-data">
-            <div class="mb-3">
-                <label for="login_id" class="form-label">Login ID</label>
-                <input type="text" class="form-control" id="login_id" name="login_id" value="{{ user.login_id }}" readonly>
-            </div>
-            <div class="mb-3">
-                <label for="register_as" class="form-label">Register As</label>
-                <input type="text" class="form-control" id="register_as" name="register_as" value="{{ user.register_as }}" readonly>
-            </div>
-            <div class="mb-3">
-                <label for="full_name" class="form-label">Full Name</label>
-                <input type="text" class="form-control" id="full_name" name="full_name" value="{{ user.full_name }}">
-            </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Email</label>
-                <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}">
-            </div>
-            <div class="mb-3">
-                <label for="mobile_number" class="form-label">Mobile Number</label>
-                <input type="text" class="form-control" id="mobile_number" name="mobile_number" value="{{ user.mobile_number }}">
-            </div>
-            <div class="mb-3">
-                <label for="date_of_birth" class="form-label">Date of Birth</label>
-                <input type="date" class="form-control" id="date_of_birth" name="date_of_birth" value="{{ user.date_of_birth }}">
-            </div>
-            <div class="mb-3">
-                <label for="address_line1" class="form-label">Address Line 1</label>
-                <input type="text" class="form-control" id="address_line1" name="address_line1" value="{{ user.address_line1 }}">
-            </div>
-            <div class="mb-3">
-                <label for="address_line2" class="form-label">Address Line 2</label>
-                <input type="text" class="form-control" id="address_line2" name="address_line2" value="{{ user.address_line2 }}">
-            </div>
-            <div class="mb-3">
-                <label for="country" class="form-label">Country</label>
-                <input type="text" class="form-control" id="country" name="country" value="{{ user.country }}">
-            </div>
-            <div class="mb-3">
-                <label for="state" class="form-label">State</label>
-                <input type="text" class="form-control" id="state" name="state" value="{{ user.state }}">
-            </div>
-            <div class="mb-3">
-                <label for="city" class="form-label">City</label>
-                <input type="text" class="form-control" id="city" name="city" value="{{ user.city }}">
-            </div>
-            <div class="mb-3">
-                <label for="photo" class="form-label">Photo</label>
-                <input type="file" class="form-control" id="photo" name="photo">
-                {% if user.photo %}
-                <img src="{{ url_for('static', filename='uploads/' ~ user.photo) }}" alt="User Photo" class="img-fluid mt-2" width="100">
-                {% endif %}
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="login_id" class="form-label">Login ID</label>
+                        <input type="text" class="form-control" id="login_id" name="login_id"
+                            value="{{ user.login_id }}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="register_as" class="form-label">Register As</label>
+                        <input type="text" class="form-control" id="register_as" name="register_as"
+                            value="{{ user.register_as }}" readonly>
+                    </div>
+                    <div class="mb-3">
+                        <label for="full_name" class="form-label">Full Name</label>
+                        <input type="text" class="form-control" id="full_name" name="full_name"
+                            value="{{ user.full_name }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="mobile_number" class="form-label">Mobile Number</label>
+                        <input type="text" class="form-control" id="mobile_number" name="mobile_number"
+                            value="{{ user.mobile_number }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="date_of_birth" class="form-label">Date of Birth</label>
+                        <input type="date" class="form-control" id="date_of_birth" name="date_of_birth"
+                            value="{{ user.date_of_birth }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="address_line1" class="form-label">Address Line 1</label>
+                        <input type="text" class="form-control" id="address_line1" name="address_line1"
+                            value="{{ user.address_line1 }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="address_line2" class="form-label">Address Line 2</label>
+                        <input type="text" class="form-control" id="address_line2" name="address_line2"
+                            value="{{ user.address_line2 }}">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="mb-3">
+                        <label for="country" class="form-label">Country</label>
+                        <input type="text" class="form-control" id="country" name="country" value="{{ user.country }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="state" class="form-label">State</label>
+                        <input type="text" class="form-control" id="state" name="state" value="{{ user.state }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="city" class="form-label">City</label>
+                        <input type="text" class="form-control" id="city" name="city" value="{{ user.city }}">
+                    </div>
+                    <div class="mb-3">
+                        <label for="photo" class="form-label">Photo</label>
+                        <input type="file" class="form-control" id="photo" name="photo">
+                        {% if user.photo %}
+                        <img src="{{ url_for('static', filename='uploads/' ~ user.photo) }}" alt="User Photo"
+                            class="img-fluid mt-2" width="100">
+                        {% endif %}
+                    </div>
+                </div>
             </div>
             <div class="d-grid">
                 <button type="submit" class="btn btn-warning text-white">Update</button>
@@ -64,4 +87,18 @@
         </form>
     </div>
 </div>
+
+<script>
+    function validateForm() {
+        const dateOfBirth = document.getElementById('date_of_birth').value;
+        const today = new Date().toISOString().split('T')[0];
+
+        if (dateOfBirth > today) {
+            alert('Date of Birth cannot be a future date.');
+            return false;
+        }
+
+        return true;
+    }
+</script>
 {% endblock %}

@@ -7,20 +7,76 @@
 
 <div class="container d-flex justify-content-center align-items-center my-5">
     <div class="col-12 col-md-6">
-        <form id="placeOrderForm" method="POST" action="{{ url_for('place_order') }}">
+        <form id="placeOrderForm" method="POST" action="{{ url_for('place_order') }}" onsubmit="return validatePlaceOrderForm()">
             <input type="hidden" name="transport_id" value="{{ transport.transport_id }}">
-            <div class="mb-3">
-                <label for="orderDetails" class="form-label">Order Details</label>
-                <textarea class="form-control" id="orderDetails" name="orderDetails" rows="5" required></textarea>
-            </div>
             <div class="mb-3">
                 <label for="message" class="form-label">Message</label>
                 <textarea class="form-control" id="message" name="message" rows="3"></textarea>
+                <div class="error" id="message_error"></div>
             </div>
             <div class="d-grid">
                 <button type="submit" class="btn btn-success text-center">Submit Order</button>
             </div>
+            <button type="button" class="btn btn-primary text-center mt-3" id="checkout-button">Pay Now</button>
         </form>
     </div>
 </div>
+
+<script>
+    function validatePlaceOrderForm() {
+        const messageInput = document.getElementById('message');
+        const messageError = document.getElementById('message_error');
+
+        if (messageInput.value.trim() === '') {
+            messageError.textContent = 'Please enter a message.';
+            messageInput.classList.add('is-invalid');
+            return false;
+        }
+
+        messageError.textContent = '';
+        messageInput.classList.remove('is-invalid');
+        return true;
+    }
+</script>
+<script>
+var stripe = Stripe('pk_test_51QoTzxFNo0h4tR8GAhVIS3Mf5zPznNqPNCJelrdnIpoTXpdTYoONbRY43o9lIWlsdhy1Lr2T26CSQzTNrlQxVpgP00fqDPiD1f');
+
+var checkoutButton = document.getElementById('checkout-button');
+
+checkoutButton.addEventListener('click', function (event) {
+    event.preventDefault(); // Prevent form submission
+    fetch('/create-checkout-session', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            transport_id: '{{ transport.transport_id }}'
+        }),
+    })
+    .then(function (response) {
+        return response.json();
+    })
+    .then(function (sessionId) {
+        return stripe.redirectToCheckout({ sessionId: sessionId.id });
+    })
+    .then(function (result) {
+        if (result.error) {
+            alert(result.error.message);
+        }
+    })
+    .catch(function (error) {
+        console.error('Error:', error);
+    });
+});
+</script>
+<style>
+    .error {
+        color: red;
+    }
+    .is-invalid {
+        border-color: red;
+    }
+</style>
+
 {% endblock %}

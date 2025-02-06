@@ -4,6 +4,15 @@
 
 {% block content %}
 <h3 class="text-center p-3">All available Freights</h3>
+{% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alert-container col-6 container">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %}
 
 <body>
     <div class="container mt-5">
@@ -39,9 +48,9 @@
                         <td><img src="{{ url_for('static', filename='uploads/' ~ transport.image) }}" alt="Transport Image" width="100"></td>
                         <td>{{ transport.title }}</td>
                         <td>{{ transport.publishing_date }}</td>
-                        <td>{{ transport.requistor_name }}</td>
+                        <td>{{ transport.full_name }}</td>
                         <td>{{ transport.email }}</td>
-                        <td>{{ transport.contact_number }}</td>
+                        <td>{{ transport.mobile_number }}</td>
                         <td>{{ transport.pickup_address }}</td>
                         <td>{{ transport.drop_address }}</td>
                         <td>{{ transport.description }}</td>

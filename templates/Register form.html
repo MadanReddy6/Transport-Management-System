@@ -4,13 +4,13 @@
 
 {% block content %}
 
-<div class="container d-flex justify-content-center align-items-center my-5">
-    <div class="col-12 col-md-6">
+<div class="container shadow d-flex justify-content-center align-items-center my-5">
+    <div class="col-12 col-md-6 ">
         <h4 class="text-center">USER REGISTRATION FORM</h4>
         <form id="registrationForm" method="POST" enctype="multipart/form-data">
             <label for="type">Register As</label>
             <select name="Registered_as" id="select" class="form-control">
-                <option value="select" activate>select</option>
+                <option value="" activate>select</option>
                 <option value="Forwarder">Forwarder</option>
                 <option value="Carrier">Carrier</option>
             </select>
@@ -43,7 +43,8 @@
                         </label>
                     </div>
                     <div class="form-check">
-                        <input class="form-check-input" type="radio" name="AccountType" id="privatePerson" value="Private Person">
+                        <input class="form-check-input" type="radio" name="AccountType" id="privatePerson"
+                            value="Private Person">
                         <label class="form-check-label" for="privatePerson">
                             Private Person
                         </label>
@@ -83,28 +84,31 @@
                 </div>
                 <div class="form">
                     <label for="Country" class="form-label">Country</label>
-                    <select class="form-select country" id="Country" name="Country" aria-label="Default select example" onchange="loadStates()">
-                        <option selected>Select Country</option>
+                    <select class="form-select country" id="Country" name="Country" aria-label="Default select example"
+                        onchange="loadStates()">
+                        <option value="">Select Country</option>
                     </select>
                     <div class="error" id="Country_error"></div>
                 </div>
                 <div class="form">
                     <label for="State" class="form-label">State</label>
-                    <select class="form-select state" id="State" name="State" aria-label="Default select example" onchange="loadCities()">
-                        <option selected>Select State</option>
+                    <select class="form-select state" id="State" name="State" aria-label="Default select example"
+                        onchange="loadCities()">
+                        <option value="">Select State</option>
                     </select>
                     <div class="error" id="State_error"></div>
                 </div>
                 <div class="form">
                     <label for="City" class="form-label">City</label>
                     <select class="form-select city" id="City" name="City" aria-label="Default select example">
-                        <option selected>Select City</option>
+                        <option value="">Select City</option>
                     </select>
                     <div class="error" id="City_error"></div>
                 </div>
                 <div class="mb-3">
                     <label for="photo" class="form-label">User photo</label>
                     <input type="file" class="form-control" id="photo" name="photo">
+                    <div class="error" id="Photo_error"></div>
                 </div>
             </div>
             <div class="d-grid">
@@ -118,14 +122,14 @@
 <script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
 <script>
-    $(document).ready(function() {
-        $('#registrationForm').on('submit', async function(event) {
+    $(document).ready(function () {
+        $('#registrationForm').on('submit', async function (event) {
             event.preventDefault();
             var formData = new FormData(this);
 
             // Log form data for debugging
             for (var pair of formData.entries()) {
-                console.log(pair[0]+ ': ' + pair[1]);
+                console.log(pair[0] + ': ' + pair[1]);
             }
 
             // Validate form fields
@@ -147,6 +151,7 @@
                     console.log('Parsed response:', result); // Debugging statement
                     if (response.ok) {
                         $('#responseMessage').html('<div class="alert alert-success">' + result.msg + '</div>');
+                        alert('You have registered successfully!');
                         if (result.redirect_url) {
                             window.location.href = result.redirect_url;
                         }
@@ -166,29 +171,54 @@
         function validateForm() {
             var isValid = true;
             var errorMessage = '';
+            var firstInvalidField = null;
 
             // Clear previous errors
             $('.error').html('');
             $('.form-control').removeClass('is-invalid');
 
             // Check for empty fields
-            $('#registrationForm input, #registrationForm select').each(function() {
+            $('#registrationForm input, #registrationForm select').each(function () {
                 if ($(this).val() === '' && $(this).attr('name') !== 'address2' && $(this).attr('name') !== 'photo') {
                     isValid = false;
                     errorMessage = 'Please fill out this field.';
                     $(this).addClass('is-invalid');
                     $('#' + $(this).attr('id') + '_error').html(errorMessage);
+                    if (!firstInvalidField) {
+                        firstInvalidField = this;
+                    }
                 }
             });
+            var register = $('#Registered_as_error').val();
+            if (!register) {
+                invalid = false;
+                errorMessage = 'Please select any one.';
+                $('#Email').addClass('is-invalid');
+                $('#Email_error').html(errorMessage);
+                if (!firstInvalidField) {
+                    firstInvalidField = $('#Email')[0];
+                }
+            }
 
             // Validate email format
             var email = $('#Email').val();
             var emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,6}$/;
-            if (!emailPattern.test(email)) {
+            if (email === '') {
+                isValid = false;
+                errorMessage = 'Email is required.';
+                $('#Email').addClass('is-invalid');
+                $('#Email_error').html(errorMessage);
+                if (!firstInvalidField) {
+                    firstInvalidField = $('#Email')[0];
+                }
+            } else if (!emailPattern.test(email)) {
                 isValid = false;
                 errorMessage = 'Please enter a valid email address.';
                 $('#Email').addClass('is-invalid');
                 $('#Email_error').html(errorMessage);
+                if (!firstInvalidField) {
+                    firstInvalidField = $('#Email')[0];
+                }
             }
 
             // Validate password
@@ -200,16 +230,25 @@
                 errorMessage = 'Password is required.';
                 $('#Password').addClass('is-invalid');
                 $('#Password_error').html(errorMessage);
+                if (!firstInvalidField) {
+                    firstInvalidField = $('#Password')[0];
+                }
             } else if (!passwordPattern.test(password)) {
                 isValid = false;
                 errorMessage = 'Password must be at least 6 characters long and contain at least one letter, one number, and one special character.';
                 $('#Password').addClass('is-invalid');
                 $('#Password_error').html(errorMessage);
+                if (!firstInvalidField) {
+                    firstInvalidField = $('#Password')[0];
+                }
             } else if (password !== confirmPassword) {
                 isValid = false;
                 errorMessage = 'Passwords do not match.';
                 $('#confirmpassword').addClass('is-invalid');
                 $('#confirmpassword_error').html(errorMessage);
+                if (!firstInvalidField) {
+                    firstInvalidField = $('#confirmpassword')[0];
+                }
             }
 
             // Validate phone number format
@@ -220,6 +259,9 @@
                 errorMessage = 'Please enter a valid 10-digit phone number.';
                 $('#mobilenum').addClass('is-invalid');
                 $('#mobilenum_error').html(errorMessage);
+                if (!firstInvalidField) {
+                    firstInvalidField = $('#mobilenum')[0];
+                }
             }
 
             // Ensure a country, state, and city are selected
@@ -228,6 +270,71 @@
                 errorMessage = 'Please select a country, state, and city.';
                 $('#Country, #State, #City').addClass('is-invalid');
                 $('#Country_error').html(errorMessage);
+                if (!firstInvalidField) {
+                    firstInvalidField = $('#Country')[0];
+                }
+            }
+
+            // Validate account type
+            const accountTypeInputs = document.getElementsByName('AccountType');
+            const accountTypeError = document.getElementById('AccountType_error');
+            let accountTypeSelected = false;
+
+            for (const input of accountTypeInputs) {
+                if (input.checked) {
+                    accountTypeSelected = true;
+                    break;
+                }
+            }
+
+            if (!accountTypeSelected) {
+                isValid = false;
+                accountTypeError.textContent = 'Please select an account type.';
+                if (!firstInvalidField) {
+                    firstInvalidField = accountTypeInputs[0];
+                }
+            } else {
+                accountTypeError.textContent = '';
+            }
+
+            // Validate birth date
+            var dob = $('#dob').val();
+            var today = new Date().toISOString().split('T')[0];
+            if (dob > today) {
+                isValid = false;
+                errorMessage = 'Birth date cannot be in the future.';
+                $('#dob').addClass('is-invalid');
+                $('#dob_error').html(errorMessage);
+                if (!firstInvalidField) {
+                    firstInvalidField = $('#dob')[0];
+                }
+            }
+
+            // Validate image
+            var image = $('#photo').val();
+            if (image === '') {
+                isValid = false;
+                errorMessage = 'Image is required.';
+                $('#photo').addClass('is-invalid');
+                $('#Photo_error').html(errorMessage);
+                if (!firstInvalidField) {
+                    firstInvalidField = $('#photo')[0];
+                }
+            } else {
+                var allowedExtensions = /(\.jpg|\.jpeg|\.png|\.gif)$/i;
+                if (!allowedExtensions.exec(image)) {
+                    isValid = false;
+                    errorMessage = 'Invalid file type. Only JPG, JPEG, PNG, and GIF are allowed.';
+                    $('#photo').addClass('is-invalid');
+                    $('#Photo_error').html(errorMessage);
+                    if (!firstInvalidField) {
+                        firstInvalidField = $('#photo')[0];
+                    }
+                }
+            }
+
+            if (firstInvalidField) {
+                firstInvalidField.focus();
             }
 
             return isValid;
@@ -354,6 +461,7 @@
     .error {
         color: red;
     }
+
     .eye-icon {
         position: absolute;
         right: 10px;
