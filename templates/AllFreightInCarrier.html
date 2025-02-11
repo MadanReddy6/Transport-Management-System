@@ -5,6 +5,16 @@
 {% block content %}
 <div class="container mt-4">
     <h2 class="text-center">All Freights in Carrier</h2>
+  
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alert-container col-6 container">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %} 
 <form method="GET" action="{{ url_for('AllFreightInCarrier') }}" class="d-flex mb-4">
     <div class="input-group" style="width: 300px;">
         <input class="form-control" type="search" name="search" placeholder="Search by title" aria-label="Search" value="{{ search }}">

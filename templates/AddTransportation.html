@@ -6,136 +6,157 @@
 {% block content %}
 
 <h2 class="text-center mt-4 mb-lg-2">Add Freight</h2>
-
 <div class="container d-flex justify-content-center align-items-center my-5">
     <div class="col-md-10 align-items-center shadow p-lg-5 p-4">
         <form id="addFreightForm" method="POST" enctype="multipart/form-data">
-            <div class="row">
-                <div class="col-lg-6">
-                    <div class="mb-3">
-                        <label for="title" class="form-label">Transport Title</label>
-                        <input type="text" class="form-control" id="title" name="title">
-                        <div class="error" id="title_error"></div>
+            <fieldset>
+                <legend>Transport Details</legend>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label for="title" class="form-label">Transport Title</label>
+                            <input type="text" class="form-control" id="title" name="title">
+                            <div class="error" id="title_error"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="quantity" class="form-label">Quantity</label>
+                            <input type="number" class="form-control" id="quantity" name="quantity">
+                            <div class="error" id="quantity_error"></div>
+                        </div>
+                        
+                        
+                        <div class="mb-3">
+                            <label for="publishing_date" class="form-label">Publishing Date</label>
+                            <input type="date" class="form-control" id="publishing_date" name="publishing_date">
+                            <div class="error" id="publishing_date_error"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="length_cm" class="form-label">Length (cm)</label>
+                            <input type="number" class="form-control" id="length_cm" name="length_cm">
+                            <div class="error" id="length_cm_error"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="width_cm" class="form-label">Width (cm)</label>
+                            <input type="number" class="form-control" id="width_cm" name="width_cm">
+                            <div class="error" id="width_cm_error"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="height_cm" class="form-label">Height (cm)</label>
+                            <input type="number" class="form-control" id="height_cm" name="height_cm">
+                            <div class="error" id="height_cm_error"></div>
+                        </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="quantity" class="form-label">Quantity</label>
-                        <input type="number" class="form-control" id="quantity" name="quantity" >
-                        <div class="error" id="quantity_error"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="pickup_date" class="form-label">Pickup Date</label>
-                        <input type="date" class="form-control" id="pickup_date" name="pickup_date" >
-                        <div class="error" id="pickup_date_error"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="delivery_date" class="form-label">Delivery Date</label>
-                        <input type="date" class="form-control" id="delivery_date" name="delivery_date" >
-                        <div class="error" id="delivery_date_error"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="publishing_date" class="form-label">Publishing Date</label>
-                        <input type="date" class="form-control" id="publishing_date" name="publishing_date" >
-                        <div class="error" id="publishing_date_error"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="length_cm" class="form-label">Length (cm)</label>
-                        <input type="number" class="form-control" id="length_cm" name="length_cm" >
-                        <div class="error" id="length_cm_error"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="width_cm" class="form-label">Width (cm)</label>
-                        <input type="number" class="form-control" id="width_cm" name="width_cm">
-                        <div class="error" id="width_cm_error"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="height_cm" class="form-label">Height (cm)</label>
-                        <input type="number" class="form-control" id="height_cm" name="height_cm" >
-                        <div class="error" id="height_cm_error"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="pickup_address" class="form-label">Pickup Address</label>
-                        <input type="text" class="form-control" id="pickup_address" name="pickup_address" >
-                        <div class="error" id="pickup_address_error"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="drop_address" class="form-label">Drop Address</label>
-                        <input type="text" class="form-control" id="drop_address" name="drop_address" >
-                        <div class="error" id="drop_address_error"></div>
-                    </div>
-                    
-                </div>
-                <div class="col-md-6">
-                    <div class="mb-3">
-                        <label for="PickupCountry" class="form-label">Pickup Country</label>
-                        <select class="form-select country" id="PickupCountry" name="PickupCountry" >
-                            <option value="">Select Country</option>
-                        </select>
-                        <div class="error" id="PickupCountry_error"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="PickupState" class="form-label">Pickup State</label>
-                        <select class="form-select state" id="PickupState" name="PickupState" >
-                            <option value="">Select State</option>
-                        </select>
-                        <div class="error" id="PickupState_error"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="PickupCity" class="form-label">Pickup City</label>
-                        <select class="form-select city" id="PickupCity" name="PickupCity" >
-                            <option value="">Select City</option>
-                        </select>
-                        <div class="error" id="PickupCity_error"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="DeliveryCountry" class="form-label">Delivery Country</label>
-                        <select class="form-select country" id="DeliveryCountry" name="DeliveryCountry" >
-                            <option value="">Select Country</option>
-                        </select>
-                        <div class="error" id="DeliveryCountry_error"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="DeliveryState" class="form-label">Delivery State</label>
-                        <select class="form-select state" id="DeliveryState" name="DeliveryState" >
-                            <option value="">Select State</option>
-                        </select>
-                        <div class="error" id="DeliveryState_error"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="DeliveryCity" class="form-label">Delivery City</label>
-                        <select class="form-select city" id="DeliveryCity" name="DeliveryCity" >
-                            <option value="">Select City</option>
-                        </select>
-                        <div class="error" id="DeliveryCity_error"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="price" class="form-label">Price</label>
-                        <input type="number" class="form-control" id="price" name="price" >
-                        <div class="error" id="price_error"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="weight_kg" class="form-label">Weight (kg)</label>
-                        <input type="number" class="form-control" id="weight_kg" name="weight_kg" >
-                        <div class="error" id="weight_kg_error"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="image" class="form-label">Image</label>
-                        <input type="file" class="form-control" id="image" name="image">
-                        <div class="error" id="image_error"></div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="description" class="form-label">Description</label>
-                        <textarea class="form-control" id="description" name="description" rows="3"></textarea>
-                        <div class="error" id="description_error"></div>
+                    <div class="col-md-6">
+                        <div class="mb-3">
+                            <label for="price" class="form-label">Price</label>
+                            <input type="number" class="form-control" id="price" name="price">
+                            <div class="error" id="price_error"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="weight_kg" class="form-label">Weight (kg)</label>
+                            <input type="number" class="form-control" id="weight_kg" name="weight_kg">
+                            <div class="error" id="weight_kg_error"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="image" class="form-label">Image</label>
+                            <input type="file" class="form-control" id="image" name="image">
+                            <div class="error" id="image_error"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="description" class="form-label">Description</label>
+                            <textarea class="form-control" id="description" name="description" rows="3"></textarea>
+                            <div class="error" id="description_error"></div>
+                        </div>
                     </div>
                 </div>
-            </div>
-            <div class="d-flex justify-content-center alert-danger ">
-                <button type="submit " class="btn btn-warning text-white">Submit</button>
+            </fieldset>
+            <fieldset>
+                <legend>Pickup Details</legend>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label for="pickup_date" class="form-label">Pickup Date</label>
+                            <input type="date" class="form-control" id="pickup_date" name="pickup_date">
+                            <div class="error" id="pickup_date_error"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="pickup_address" class="form-label">Pickup Address</label>
+                            <input type="text" class="form-control" id="pickup_address" name="pickup_address">
+                            <div class="error" id="pickup_address_error"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="PickupCountry" class="form-label">Pickup Country</label>
+                            <select class="form-select country" id="PickupCountry" name="PickupCountry">
+                                <option value="">Select Country</option>
+                            </select>
+                            <div class="error" id="PickupCountry_error"></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label for="PickupState" class="form-label">Pickup State</label>
+                            <select class="form-select state" id="PickupState" name="PickupState">
+                                <option value="">Select State</option>
+                            </select>
+                            <div class="error" id="PickupState_error"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="PickupCity" class="form-label">Pickup City</label>
+                            <select class="form-select city" id="PickupCity" name="PickupCity">
+                                <option value="">Select City</option>
+                            </select>
+                            <div class="error" id="PickupCity_error"></div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>
+            <fieldset>
+                <legend>Drop Details</legend>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label for="delivery_date" class="form-label">Delivery Date</label>
+                            <input type="date" class="form-control" id="delivery_date" name="delivery_date">
+                            <div class="error" id="delivery_date_error"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="drop_address" class="form-label">Drop Address</label>
+                            <input type="text" class="form-control" id="drop_address" name="drop_address">
+                            <div class="error" id="drop_address_error"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="DeliveryCountry" class="form-label">Delivery Country</label>
+                            <select class="form-select country" id="DeliveryCountry" name="DeliveryCountry">
+                                <option value="">Select Country</option>
+                            </select>
+                            <div class="error" id="DeliveryCountry_error"></div>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="mb-3">
+                            <label for="DeliveryState" class="form-label">Delivery State</label>
+                            <select class="form-select state" id="DeliveryState" name="DeliveryState">
+                                <option value="">Select State</option>
+                            </select>
+                            <div class="error" id="DeliveryState_error"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="DeliveryCity" class="form-label">Delivery City</label>
+                            <select class="form-select city" id="DeliveryCity" name="DeliveryCity">
+                                <option value="">Select City</option>
+                            </select>
+                            <div class="error" id="DeliveryCity_error"></div>
+                        </div>
+                    </div>
+                </div>
+            </fieldset>      <div class="d-flex justify-content-center alert-danger mt-3">
+                <button type="submit" class="btn btn-warning text-white">Submit</button>
             </div>
         </form>
-        <div id="responseMessage" class="mt-3"></div>
     </div>
 </div>
+
+
 
 <script>
     $(document).ready(function() {

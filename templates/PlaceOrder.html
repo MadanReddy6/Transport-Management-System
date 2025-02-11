@@ -5,6 +5,16 @@
 {% block content %}
 <h3 class="text-center p-3">Place an Order</h3>
 
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            <div class="alert-container col-6 container">
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }}">{{ message }}</div>
+                {% endfor %}
+            </div>
+        {% endif %}
+    {% endwith %} 
+
 <div class="container d-flex justify-content-center align-items-center my-5">
     <div class="col-12 col-md-6">
         <form id="placeOrderForm" method="POST" action="{{ url_for('place_order') }}" onsubmit="return validatePlaceOrderForm()">
@@ -17,7 +27,7 @@
             <div class="d-grid">
                 <button type="submit" class="btn btn-success text-center">Submit Order</button>
             </div>
-            <button type="button" class="btn btn-primary text-center mt-3" id="checkout-button">Pay Now</button>
+            <!-- <button type="button" class="btn btn-primary text-center mt-3" id="checkout-button">Pay Now</button> -->
         </form>
     </div>
 </div>

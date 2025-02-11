@@ -17,12 +17,12 @@
     {% endwith %}
     <form id="loginForm" class="shadow p-3" method="POST" action="{{ url_for('login') }}" onsubmit="return validateLoginForm()">
         <div class="mb-3">
-            <label for="Id" class="form-label">Login ID</label>
+            <label for="Id" class="form-label">Login ID <span class="required">*</span></label>
             <input type="text" class="form-control" id="Id" name="Id">
             <p id="loginIdError" class="text-danger"></p>
         </div>
         <div class="mb-3 position-relative">
-            <label for="Password" class="form-label">Password</label>
+            <label for="Password" class="form-label">Password <span class="required">*</span></label>
             <div class="input-group">
                 <input type="password" class="form-control" id="Password" name="Password" pattern=".{8,}" title="Password must be at least 8 characters long">
                 <span class="input-group-text eye-icon" onclick="togglePasswordVisibility('Password')">&#128065;</span>

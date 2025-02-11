@@ -78,10 +78,9 @@ p{
     transform: scale(1.05);
 }
 
-/* .contactForm{
-    box-shadow:
-} */
-
+.required {
+    color: red;
+}
 
 
 
@@ -101,7 +100,7 @@ p{
     }
 }
 
-.transport_table th {
+.transport_table th, .T-Head {
     background-color: rgb(240, 162, 139) !important;
     color: white;
     border:none;

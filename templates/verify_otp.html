@@ -16,7 +16,7 @@
     {% endwith %}
     <form id="verifyOtpForm" class="shadow p-3" method="POST" action="{{ url_for('verify_otp') }}" onsubmit="return validateOtp()">
         <div class="mb-3">
-            <label for="otp" class="form-label">OTP</label>
+            <label for="otp" class="form-label">OTP <span class="required">*</span></label>
             <input type="text" class="form-control" id="otp" name="otp"  title="OTP must be a 6-digit number">
             <p id="otpError" class="text-danger"></p>
         </div>
@@ -34,7 +34,7 @@ function validateOtp() {
     const otpError = document.getElementById('otpError');
 
     if (!otpPattern.test(otpValue)) {
-        otpError.textContent = 'OTP must be a 6-digit number';
+        otpError.textContent = 'please enter 6-digit OTP';
         return false;
     }
     otpError.textContent = '';

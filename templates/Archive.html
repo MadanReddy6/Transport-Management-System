@@ -23,19 +23,19 @@
     <div class="table-responsive">
         {% if transports %}
         <table class="table table-bordered table-hover mx-auto">
-            <thead class="thead-dark" style="background-color: rgb(146, 77, 27) !important;">
+            <thead >
                 <tr>
-                    <th scope="col">Transport ID</th>
-                    <th scope="col">Image</th>
-                    <th scope="col">Title</th>
-                    <th scope="col">Publishing Date</th>
-                    <th scope="col">Freight Owner</th>
-                    <th scope="col">Email</th>
-                    <th scope="col">Contact Number</th>
-                    <th scope="col">Pickup Address</th>
-                    <th scope="col">Drop Address</th>
-                    <th scope="col">Description</th>
-                    <th scope="col">Actions</th>
+                    <th class="T-Head"  scope="col">Transport ID</th>
+                    <th class="T-Head" scope="col">Image</th>
+                    <th class="T-Head" scope="col">Title</th>
+                    <th class="T-Head" scope="col">Publishing Date</th>
+                    <th class="T-Head" scope="col">Freight Owner</th>
+                    <th class="T-Head" scope="col">Email</th>
+                    <th class="T-Head" scope="col">Contact Number</th>
+                    <th class="T-Head" scope="col">Pickup Address</th>
+                    <th class="T-Head" scope="col">Drop Address</th>
+                    <th class="T-Head" scope="col">Description</th>
+                    <th class="T-Head" scope="col">Actions</th>
                 </tr>
             </thead>
             <tbody>
@@ -94,5 +94,10 @@
         </nav>
     </div>
     {% endif %}
+    <style>
+        .T-Head{
+            background-color: ;
+        }
+    </style>
 </div>
 {% endblock %}

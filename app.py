@@ -918,8 +918,6 @@ def send_password_reset_otp():
         otp = generate_otp()
         otp_storage[email] = otp
         email_storage[otp] = email
-        session['email']=email
-        print(f"Email=================: {session['email']}")
         send_email(email, "Password Reset OTP", f"Your OTP is: {otp}")
         print(f"OTP=================: {otp}")
         return jsonify({"msg": "OTP sent to your email."}), 200
@@ -934,9 +932,7 @@ def verify_password_reset_otp():
 def verify_password_reset_otp_post():
     data = request.get_json()
     otp = data.get('otp')
-    email = session.get('email')
-    print('------------------', email, otp)
-    # email = email_storage.get(otp)
+    email = email_storage.get(otp)
     stored_otp = otp_storage.get(email)
     print('------------------', email, otp)
     
@@ -954,8 +950,7 @@ def reset_password_post():
     data = request.get_json()
     otp = data.get('otp')
     new_password = data.get('new_password')
-    email = session.get('email')
-    # email = email_storage.get(otp)  # Retrieve email using OTP
+    email = email_storage.get(otp)  # Retrieve email using OTP
     print('------------------', email, otp)
     
     if email:
@@ -964,7 +959,7 @@ def reset_password_post():
         print(f'==========={user}')
         
         if user:
-            cursor.execute('UPDATE Users SET password = %s WHERE user_id = %s', (new_password, user['user_id']))
+            cursor.execute('UPDATE User_Details SET password = %s WHERE user_id = %s', (new_password, user['user_id']))
             conn.commit()
             return jsonify({"msg": "Password reset successful.", "redirect_url": url_for('login')}), 200
         else:

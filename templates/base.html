@@ -19,7 +19,7 @@
     <div class="header-container d-flex align-items-center justify-content-between p-3">
         <nav class="navbar navbar-expand-lg ">
             <div class="header-title">
-                <h3 class="mb-0 ">Transportation System</h3>
+                <h3 class="mb-0 ">Transportation Management System</h3>
             </div>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
                 aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
@@ -62,10 +62,6 @@
                         <a class="nav-link" href="{{url_for('CarrierDB')}}">Dashboard</a>
                     </li>
 
-                    
-                    <li class="nav-item">
-                      {#  <a class="nav-link" href="{{url_for('AllFreightInCarrier')}}">All Freights</a>#}
-                    </li>
                     {% endif %}
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
@@ -84,19 +80,6 @@
                     <li class="nav-item">
                         <a class="nav-link" href="{{url_for('Login')}}">Login</a>
                     </li>
-                    {#
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button"
-                            data-bs-toggle="dropdown" aria-expanded="false">
-                            Register
-                        </a>
-                        <ul class="dropdown-menu" aria-labelledby="navbarDropdown">
-                            <li><a class="dropdown-item text-black" href="{{url_for('registor_page')}}">Forwarder</a>
-                            </li>
-                            <li><a class="dropdown-item text-black" href="{{url_for('registor_page')}}">Carrier</a></li>
-                        </ul>
-                    </li>
-                    #}
                     <li class="nav-item">
                         <a class="nav-link" href="{{ url_for('Contactus') }}">Contact</a>
                     </li>
@@ -147,7 +130,7 @@
                     <p><a href="{{url_for('about')}}" class="text-decoration-none text-white">About Us</a></p>
                     <p><a href="{{url_for('Contactus')}}" class="text-decoration-none text-white">Contact </a></p>
                     <p><a href="{{url_for('Login')}}" class="text-decoration-none text-white">Login</a></p>
-                    <p><a href="{{url_for('Contactus')}}" class="text-decoration-none text-white"></a>Email Us</p>
+                    <p><a href="{{url_for('Contactus')}}" class="text-decoration-none text-white">Email Us</a></p>
                 </div>
                 <div class="col-12 col-md-3">
                     <h5 class="pt-3 text-white" >ABOUT PROJECT</h5>
